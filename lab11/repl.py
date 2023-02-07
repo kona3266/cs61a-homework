@@ -33,4 +33,6 @@ if __name__ == '__main__':
         except (KeyboardInterrupt, EOFError):  # Ctrl-C, Ctrl-D
             print()  # blank line
             break  # exit while loop (and end program)
+        except ValueError as e:
+            print("value error:" + e)
 
