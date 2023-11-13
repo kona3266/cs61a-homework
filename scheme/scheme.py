@@ -136,6 +136,15 @@ class Frame(object):
             raise SchemeError('Incorrect number of arguments to function call')
         # BEGIN PROBLEM 10
         "*** YOUR CODE HERE ***"
+        child_env = Frame(self)
+        validate_formals(formals)
+        while isinstance(formals, Pair):
+            symbol = formals.first
+            value = vals.first
+            child_env.define(symbol, value)
+            formals = formals.rest
+            vals = vals.rest
+        return child_env
         # END PROBLEM 10
 
 ##############
@@ -204,6 +213,8 @@ class LambdaProcedure(Procedure):
         of values, for a lexically-scoped call evaluated in environment ENV."""
         # BEGIN PROBLEM 11
         "*** YOUR CODE HERE ***"
+        child_frame = self.env.make_child_frame(self.formals, args)
+        return child_frame
         # END PROBLEM 11
 
     def __str__(self):
@@ -268,6 +279,9 @@ def do_define_form(expressions, env):
     elif isinstance(target, Pair) and scheme_symbolp(target.first):
         # BEGIN PROBLEM 9
         "*** YOUR CODE HERE ***"
+        validate_formals(target.rest)
+        env.define(target.first, LambdaProcedure(target.rest, expressions.rest, env))
+        return target.first
         # END PROBLEM 9
     else:
         bad_target = target.first if isinstance(target, Pair) else target
@@ -343,6 +357,17 @@ def do_and_form(expressions, env):
     """
     # BEGIN PROBLEM 12
     "*** YOUR CODE HERE ***"
+
+    val = True
+    while isinstance(expressions, Pair):
+        val = scheme_eval(expressions.first, env)
+        if is_true_primitive(val):
+            expressions = expressions.rest
+        else:
+            return False
+
+    return val
+
     # END PROBLEM 12
 
 def do_or_form(expressions, env):
@@ -360,6 +385,16 @@ def do_or_form(expressions, env):
     """
     # BEGIN PROBLEM 12
     "*** YOUR CODE HERE ***"
+    val = False
+    while isinstance(expressions, Pair):
+        val = scheme_eval(expressions.first, env)
+        if is_true_primitive(val):
+            return val
+        else:
+            expressions = expressions.rest
+    
+    return val
+
     # END PROBLEM 12
 
 def do_cond_form(expressions, env):
